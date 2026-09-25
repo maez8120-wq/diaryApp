@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>diary · little moments</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(145deg, #f9f3e9 0%, #f2e9de 100%);
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      margin: 0;
+    }
+
+    .diary-app {
+      max-width: 1100px;
+      width: 100%;
+      background: rgba(255, 251, 245, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 2.5rem;
+      box-shadow: 
+        0 20px 40px -12px rgba(0, 0, 0, 0.2),
+        inset 0 1px 4px rgba(255, 255, 255, 0.8),
+        0 0 0 1px rgba(230, 210, 190, 0.3);
+      padding: 2rem 2rem 2rem 2rem;
+      transition: all 0.2s ease;
+    }
+
+    /* header */
+    .diary-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px dashed #ddcfc0;
+    }
+
+    .diary-header h1 {
+      font-weight: 400;
+      font-size: 2rem;
+      letter-spacing: -0.5px;
+      color: #4d3e32;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .diary-header h1 span {
+      font-size: 1.8rem;
+    }
+
+    .entry-count {
+      background: #e7dbce;
+      color: #4d3e32;
+      padding: 0.3rem 0.9rem;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+    }
+
+    /* main layout */
+    .diary-main {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* left panel – form */
+    .write-panel {
+      background: #fefcf9;
+      border-radius: 2rem;
+      padding: 1.8rem 1.6rem 1.8rem 1.6rem;
+      box-shadow: 
+        0 8px 18px -6px rgba(80, 60, 40, 0.12),
+        inset 0 1px 0 #fff,
+        0 0 0 1px #efe5db;
+    }
+
+    .write-panel h2 {
+      font-size: 1.35rem;
+      font-weight: 500;
+      color: #5b4a3b;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      letter-spacing: -0.3px;
+    }
+
+    .date-display {
+      font-size: 0.9rem;
+      color: #8b7a6b;
+      margin-bottom: 1.4rem;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dotted #d9cdc0;
+      padding-bottom: 0.5rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #6b5a4b;
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+
+    .input-group input,
+    .input-group textarea {
+      width: 100%;
+      border: 1px solid #e2d6cb;
+      background: #ffffffec;
+      border-radius: 1.2rem;
+      padding: 0.9rem 1.2rem;
+      font-family: inherit;
+      font-size: 1rem;
+      color: #2d241e;
+      outline: none;
+      transition: 0.2s;
+      box-shadow: inset 0 2px 6px rgba(190, 160, 140, 0.05);
+      resize: vertical;
+    }
+
+    .input-group textarea {
+      min-height: 150px;
+      line-height: 1.5;
+    }
+
+    .input-group input:focus,
+    .input-group textarea:focus {
+      border-color: #baa28e;
+      box-shadow: 0 0 0 4px rgba(200, 170, 150, 0.15), inset 0 2px 6px rgba(0,0,0,0.02);
+      background: #fffdfb;
+    }
+
+    .input-group textarea::placeholder,
+    .input-group input::placeholder {
+      color: #b9aa9b;
+      font-style: italic;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1.6rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 3rem;
+      padding: 0.85rem 1.8rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: 0.15s;
+      background: #fff7f0;
+      color: #4e3e30;
+      box-shadow: 0 3px 8px rgba(140, 110, 90, 0.1), 0 0 0 1px #e6d9cf;
+      flex: 1 0 auto;
+    }
+
+    .btn-primary {
+      background: #6e5a4b;
+      color: white;
+      box-shadow: 0 8px 16px -6px rgba(80, 60, 40, 0.3), 0 0 0 1px #5e4c3e;
+    }
+
+    .btn-primary:hover {
+      background: #5e4c3e;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px -8px rgba(80, 60, 40, 0.4);
+    }
+
+    .btn-secondary:hover {
+      background: #f2e6dd;
+      box-shadow: 0 5px 12px rgba(140, 110, 90, 0.15), 0 0 0 1px #d6c7bb;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    /* right panel – entries */
+    .entries-panel {
+      background: #fefcf9;
+      border-radius: 2rem;
+      padding: 1.4rem 1.4rem 1rem 1.4rem;
+      box-shadow: 
+        0 8px 18px -6px rgba(80, 60, 40, 0.12),
+        inset 0 1px 0 #fff,
+        0 0 0 1px #efe5db;
+      display: flex;
+      flex-direction: column;
+      max-height: 600px;
+      min-height: 400px;
+    }
+
+    .entries-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding: 0 0.4rem 0.6rem 0.4rem;
+      border-bottom: 1px solid #ecdfd5;
+    }
+
+    .entries-header h3 {
+      font-weight: 500;
+      font-size: 1.2rem;
+      color: #5b4a3b;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .clear-btn {
+      background: none;
+      border: none;
+      font-size: 0.8rem;
+      color: #aa8f7c;
+      cursor: pointer;
+      padding: 0.3rem 0.7rem;
+      border-radius: 30px;
+      transition: 0.15s;
+      font-weight: 500;
+      text-decoration: underline dotted;
+      text-underline-offset: 4px;
+    }
+
+    .clear-btn:hover {
+      color: #a5524a;
+      background: #f9ece4;
+    }
+
+    .entries-list {
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 0.3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      scrollbar-width: thin;
+      scrollbar-color: #d9c7ba #f3e9e1;
+    }
+
+    .entries-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .entries-list::-webkit-scrollbar-track {
+      background: #f3e9e1;
+      border-radius: 10px;
+    }
+
+    .entries-list::-webkit-scrollbar-thumb {
+      background: #d9c7ba;
+      border-radius: 10px;
+    }
+
+    .entry-card {
+      background: #fffcf8;
+      border-radius: 1.6rem;
+      padding: 1.2rem 1.3rem 1rem 1.3rem;
+      box-shadow: 0 2px 10px rgba(180, 150, 130, 0.08), 0 0 0 1px #f0e6de;
+      transition: 0.15s;
+      animation: fadeSlide 0.25s ease-out;
+      border-left: 5px solid #d9c2b0;
+      word-break: break-word;
+    }
+
+    @keyframes fadeSlide {
+      0% { opacity: 0; transform: translateY(8px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .entry-card:hover {
+      box-shadow: 0 6px 16px rgba(160, 130, 110, 0.12), 0 0 0 1px #e3d5ca;
+      background: #fffdfb;
+    }
+
+    .entry-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #4b392b;
+      margin-bottom: 0.25rem;
+      line-height: 1.3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .entry-date {
+      font-size: 0.7rem;
+      font-weight: 400;
+      color: #a08e7e;
+      background: #f3ebe4;
+      padding: 0.2rem 0.7rem;
+      border-radius: 30px;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+
+    .entry-content {
+      font-size: 0.92rem;
+      color: #55473b;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      margin-top: 0.6rem;
+      border-top: 1px dashed #ecdfd5;
+      padding-top: 0.7rem;
+      max-height: 150px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+
+    .entry-content::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .entry-content::-webkit-scrollbar-thumb {
+      background: #d9c7ba;
+      border-radius: 10px;
+    }
+
+    .delete-entry {
+      background: transparent;
+      border: none;
+      color: #b8a294;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0 0.3rem;
+      line-height: 1;
+      transition: 0.1s;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      opacity: 0.6;
+    }
+
+    .delete-entry:hover {
+      color: #b35e4e;
+      background: #fbefe9;
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #bba998;
+      font-style: italic;
+      padding: 2.5rem 1rem;
+      text-align: center;
+      gap: 0.5rem;
+    }
+
+    .empty-state span {
+      font-size: 2.5rem;
+      filter: grayscale(0.3);
+      opacity: 0.6;
+    }
+
+    /* responsive */
+    @media (max-width: 750px) {
+      .diary-main {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .diary-app {
+        padding: 1.5rem;
+        border-radius: 2rem;
+      }
+
+      .entries-panel {
+        max-height: 500px;
+      }
+
+      .diary-header h1 {
+        font-size: 1.6rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 0.8rem; }
+      .diary-app { padding: 1.2rem; }
+      .write-panel { padding: 1.4rem; }
+      .btn { padding: 0.75rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="diary-app">
+    <!-- Header -->
+    <div class="diary-header">
+      <h1>
+        <span>📖</span> dear diary
+      </h1>
+      <div class="entry-count" id="entryCount">0 entries</div>
+    </div>
+
+    <!-- Main -->
+    <div class="diary-main">
+      <!-- Left: write panel -->
+      <div class="write-panel">
+        <h2>
+          <span>✍️</span> new entry
+        </h2>
+        <div class="date-display">
+          <span id="currentDate"></span>
+          <span>🌿</span>
+        </div>
+        <div class="input-group">
+          <label for="entryTitle">title</label>
+          <input type="text" id="entryTitle" placeholder="e.g. A quiet morning..." maxlength="60">
+        </div>
+        <div class="input-group">
+          <label for="entryContent">what's on your mind?</label>
+          <textarea id="entryContent" placeholder="Write freely..."></textarea>
+        </div>
+        <div class="button-row">
+          <button class="btn btn-primary" id="saveBtn">
+            <span>💾</span> save entry
+          </button>
+          <button class="btn btn-secondary" id="clearFormBtn">
+            <span>🧹</span> clear
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: entries list -->
+      <div class="entries-panel">
+        <div class="entries-header">
+          <h3>
+            <span>📚</span> past entries
+          </h3>
+          <button class="clear-btn" id="clearAllBtn">clear all</button>
+        </div>
+        <div class="entries-list" id="entriesList">
+          <!-- entries will be injected here -->
+          <div class="empty-state" id="emptyState">
+            <span>🕊️</span>
+            no entries yet — write your first thought
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ---------- storage keys ----------
+      const STORAGE_KEY = 'diary_entries_v1';
+
+      // ---------- DOM refs ----------
+      const entryTitleInput = document.getElementById('entryTitle');
+      const entryContentInput = document.getElementById('entryContent');
+      const saveBtn = document.getElementById('saveBtn');
+      const clearFormBtn = document.getElementById('clearFormBtn');
+      const entriesList = document.getElementById('entriesList');
+      const emptyState = document.getElementById('emptyState');
+      const entryCountSpan = document.getElementById('entryCount');
+      const clearAllBtn = document.getElementById('clearAllBtn');
+      const currentDateSpan = document.getElementById('currentDate');
+
+      // ---------- state ----------
+      let entries = [];
+
+      // ---------- helpers ----------
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'unknown date';
+        return date.toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric', 
+          year: 'numeric' 
+        });
+      }
+
+      // generate short id
+      function generateId() {
+        return Date.now() + '-' + Math.random().toString(36).substring(2, 9);
+      }
+
+      // set today's date in the write panel
+      function setCurrentDate() {
+        const now = new Date();
+        const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+        currentDateSpan.textContent = now.toLocaleDateString('en-US', options);
+      }
+
+      // ---------- render entries ----------
+      function renderEntries() {
+        // Clear container but keep empty state element if needed
+        const existingCards = entriesList.querySelectorAll('.entry-card');
+        existingCards.forEach(card => card.remove());
+
+        if (entries.length === 0) {
+          if (!emptyState) {
+            // re-create empty state if it was removed? but we keep it hidden or removed?
+            // Actually we have emptyState in dom, but if it was removed from parent, we need to re-append
+            // Better: keep it in dom and toggle visibility.
+          }
+          if (emptyState) {
+            emptyState.style.display = 'flex';
+            // ensure it's inside entriesList (if not already)
+            if (!entriesList.contains(emptyState)) {
+              entriesList.appendChild(emptyState);
+            }
+          }
+          entryCountSpan.textContent = '0 entries';
+          return;
+        }
+
+        // hide empty state
+        if (emptyState) {
+          emptyState.style.display = 'none';
+        }
+
+        // sort by newest first (descending date)
+        const sortedEntries = [...entries].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        sortedEntries.forEach(entry => {
+          const card = document.createElement('div');
+          card.className = 'entry-card';
+          card.dataset.id = entry.id;
+
+          // Title row with delete button
+          const titleRow = document.createElement('div');
+          titleRow.className = 'entry-title';
+
+          const titleText = document.createElement('span');
+          titleText.textContent = entry.title || 'untitled';
+
+          const rightSide = document.createElement('span');
+          rightSide.style.display = 'flex';
+          rightSide.style.alignItems = 'center';
+          rightSide.style.gap = '8px';
+
+          const dateSpan = document.createElement('span');
+          dateSpan.className = 'entry-date';
+          dateSpan.textContent = formatDate(entry.createdAt);
+
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'delete-entry';
+          deleteBtn.innerHTML = '✕';
+          deleteBtn.setAttribute('aria-label', 'delete entry');
+          deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteEntry(entry.id);
+          });
+
+          rightSide.appendChild(dateSpan);
+          rightSide.appendChild(deleteBtn);
+
+          titleRow.appendChild(titleText);
+          titleRow.appendChild(rightSide);
+
+          // Content
+          const contentDiv = document.createElement('div');
+          contentDiv.className = 'entry-content';
+          contentDiv.textContent = entry.content;
+
+          card.appendChild(titleRow);
+          card.appendChild(contentDiv);
+
+          entriesList.appendChild(card);
+        });
+
+        // update count
+        entryCountSpan.textContent = entries.length === 1 ? '1 entry' : `${entries.length} entries`;
+      }
+
+      // ---------- save new entry ----------
+      function addEntry() {
+        const title = entryTitleInput.value.trim();
+        const content = entryContentInput.value.trim();
+
+        if (!title && !content) {
+          alert('please write something before saving ✨');
+          return;
+        }
+
+        const newEntry = {
+          id: generateId(),
+          title: title || 'untitled',
+          content: content || '(no content)',
+          createdAt: new Date().toISOString()
+        };
+
+        entries.push(newEntry);
+        persistEntries();
+        renderEntries();
+
+        // clear form
+        entryTitleInput.value = '';
+        entryContentInput.value = '';
+        entryTitleInput.focus();
+      }
+
+      // ---------- delete one entry ----------
+      function deleteEntry(id) {
+        entries = entries.filter(entry => entry.id !== id);
+        persistEntries();
+        renderEntries();
+      }
+
+      // ---------- clear all entries ----------
+      function clearAllEntries() {
+        if (entries.length === 0) return;
+        if (confirm('delete all diary entries? this cannot be undone.')) {
+          entries = [];
+          persistEntries();
+          renderEntries();
+        }
+      }
+
+      // ---------- clear form only ----------
+      function clearForm() {
+        entryTitleInput.value = '';
+        entryContentInput.value = '';
+        entryTitleInput.focus();
+      }
+
+      // ---------- persist to localStorage ----------
+      function persistEntries() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+        } catch (e) {
+          console.warn('could not save to localStorage', e);
+        }
+      }
+
+      // ---------- load from localStorage ----------
+      function loadEntries() {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            entries = JSON.parse(stored) || [];
+            // ensure each entry has required fields
+            entries = entries.filter(e => e && typeof e === 'object' && e.id && e.createdAt)
+              .map(e => ({
+                id: e.id,
+                title: e.title || 'untitled',
+                content: e.content || '',
+                createdAt: e.createdAt
+              }));
+          } else {
+            entries = [];
+          }
+        } catch (e) {
+          console.warn('could not load diary', e);
+          entries = [];
+        }
+      }
+
+      // ---------- initialise ----------
+      function init() {
+        setCurrentDate();
+        loadEntries();
+        renderEntries();
+
+        // event listeners
+        saveBtn.addEventListener('click', addEntry);
+        clearFormBtn.addEventListener('click', clearForm);
+        clearAllBtn.addEventListener('click', clearAllEntries);
+
+        // allow Ctrl/Cmd + Enter to save from textarea
+        entryContentInput.addEventListener('keydown', (e) => {
+          if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            addEntry();
+          }
+        });
+
+        entryTitleInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            entryContentInput.focus();
+          }
+        });
+      }
+
+      // start the app
+      init();
+    })();
+  </script>
+</body>
+</html>
